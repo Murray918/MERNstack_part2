@@ -5,9 +5,9 @@ import Header from './header'
 export default class App extends Component {
   render() {
     return (
-      <Header />
       <div>
-        React simple starter
+        <Header />
+        {this.props.children}
       </div>
     );
   }
