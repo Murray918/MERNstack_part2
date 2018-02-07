@@ -1,47 +1,66 @@
 import React, { Component } from 'react';
-import { reduxForm } from 'redux-form';
-//this was not in the tutorial but after going through the documentaion for redux-form it was apperant that
-//an import is needed to accsess fields otherwise it is eternally undefined
-import { Fields as fields } from 'redux-form';
+import { connect } from 'react-redux';
+import { reduxForm, Field, Form } from 'redux-form';
 import * as actions from '../../actions';
+
+const renderInput = field => {
+	const { input, type } = field;
+	return (
+		<div>
+			<input {...input} type={type} className="form-control" />
+		</div>
+	);
+};
 
 class Signin extends Component {
 	handleFormSubmit({ email, password }) {
-		console.log('with in the sign in component here is the Email: ', email);
-		console.log(
-			'with in the sign in component here is the Password: ',
-			password
-		);
+		console.log(email, password);
+
 		this.props.signinUser({ email, password });
-		//need to do somethingto log user in
+	}
+
+	renderAlert() {
+		const { errorMessage } = this.props;
+		if (errorMessage) {
+			return (
+				<div className="alert alert-danger">
+					<strong>Oops!</strong>
+					{errorMessage}
+				</div>
+			);
+		}
 	}
 
 	render() {
-		const { handleSubmit, fields: { email, password } } = this.props;
+		const { handleSubmit } = this.props;
 
 		return (
-			<form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))}>
-				<fieldset className="form-group">
+			<Form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))}>
+				<div className="form-group">
 					<label>Email:</label>
-					<input {...email} className="form-control" />
-				</fieldset>
-				<fieldset className="form-group">
+					<Field name="email" type="email" component={renderInput} />
+				</div>
+				<div className="form-group">
 					<label>Password:</label>
-					<input {...password} className="form-control" />
-				</fieldset>
+					<Field name="password" type="password" component={renderInput} />
+				</div>
+				{this.renderAlert()}
 				<button action="submit" className="btn btn-primary">
-					Sign In
+					Sign in
 				</button>
-			</form>
+			</Form>
 		);
 	}
 }
 
-export default reduxForm(
-	{
-		form: 'signin',
-		fields: ['email', 'password']
-	},
-	null,
-	actions
-)(Signin);
+function mapStateToProps(state) {
+	return {
+		// form: state.form,
+		errorMessage: state.auth.error
+	};
+}
+
+Signin = reduxForm({
+	form: 'signin'
+})(Signin);
+export default connect(mapStateToProps, actions)(Signin);
