@@ -1,5 +1,11 @@
 import axios from 'axios';
 import { broweserHistory } from 'react-router';
+import {
+	AUTH_USER,
+	UNAUTH_USER,
+	AUTH_ERROR,
+	FETCH_MESSAGE
+} from '../actions/types';
 const ROOT_URL = 'http://localhost:3090';
 
 export function signinUser({ email, password }) {
@@ -16,7 +22,18 @@ export function signinUser({ email, password }) {
 				broweserHistory.push('./feature');
 			})
 			//If the request is bad
-			.catch(() => {});
+			.catch(() => {
+				// If request it bad...
+				// - Show an error to the user
+				dispatch(authError('Bad Login Info'));
+			});
 		//-Show an error to the user
+	};
+}
+
+export function authError(error) {
+	return {
+		type: AUTH_ERROR,
+		payload: error
 	};
 }
